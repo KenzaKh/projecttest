@@ -427,37 +427,30 @@ body::after {
     z-index: 1000; 
     font-weight: bolder; }
 /* ===== MOBILE LAYOUT: STACK CARDS VERTICALLY ===== */
+/* ===== MOBILE ONLY ===== */
 @media (max-width: 768px) {
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 10px 70px 10px;
-    font-size: 14px;
-  }
 
   /* Navbar: bigger logo */
   .navbar .logo {
-    height: 60px;
+    height: 60px;  /* bigger on mobile */
     margin-left: 0;
     padding: 0;
   }
 
-  /* Main container: vertical stack */
+  /* Coffee card: stack and center */
   .main-container {
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    width: 100%;
-    max-width: 380px; /* all cards will share this width */
     margin-top: 15px;
+    padding: 0 10px;
   }
 
-  /* Coffee card: full width of container */
   .coffee-card {
-    width: 100%;
     flex-direction: column;
     padding: 20px;
+    width: 100%;
+    max-width: 380px;
     border-radius: 16px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     display: flex;
@@ -465,54 +458,24 @@ body::after {
     gap: 15px;
   }
 
-  /* Right section illustration */
+  /* Hide illustration while selecting sugar */
+  .coffee-card.selecting-sugar .right-section .illustration {
+    display: none;
+  }
+
+  /* Illustration normal state */
   .right-section .illustration {
     max-width: 180px;
     margin: 0 auto;
     transition: opacity 0.3s ease;
   }
 
-  /* Hide illustration while selecting sugar (mobile only) */
-  .coffee-card.selecting-sugar .right-section .illustration {
+  /* Hide right column completely on mobile */
+  .right-column {
     display: none;
   }
 
-  /* History card: same width */
-  .history-card {
-    width: 100%;
-    max-width: 100%;
-    padding: 15px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  /* Total card: same width */
-  .total-card {
-    width: 100%;
-    max-width: 100%;
-    padding: 15px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .total-card img {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-  }
-
-  .total-card .total-amount {
-    font-size: 18px;
-  }
-
-  /* Buttons */
+  /* Buttons, sugar section, popup tweaks */
   .coffee-btn, .select-btn, .confirm-btn {
     width: 100%;
     font-size: 15px;
@@ -536,7 +499,7 @@ body::after {
     font-size: 16px;
   }
 
-  /* Popup */
+  /* Popup smaller */
   .popup-content {
     width: 75%;
     max-width: 280px;
@@ -561,7 +524,7 @@ body::after {
     text-align: center;
   }
 
-  /* Footer */
+  /* Footer fixed outside */
   .footer {
     position: fixed;
     bottom: 5px;
@@ -574,3 +537,5 @@ body::after {
     z-index: 1000;
   }
 }
+
+ 
