@@ -431,8 +431,17 @@ body::after {
 @media (max-width: 768px) {
 
   /* Navbar: bigger logo */
+ .navbar {
+    height: 50px;
+    padding: 5px 10px;
+    justify-content: center;
+    margin-top: 5px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
   .navbar .logo {
-    height: 60px;  /* bigger on mobile */
+    height: 35px;
     margin-left: 0;
     padding: 0;
   }
@@ -539,3 +548,4 @@ body::after {
 }
 
  
+
