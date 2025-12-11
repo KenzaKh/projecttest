@@ -324,6 +324,23 @@ window.addEventListener('beforeunload', (e) => {
     return '';
   }
 });
+  if (window.innerWidth <= 768) { // only for mobile
+  const coffeeCard = document.querySelector('.coffee-card');
+
+  selectBtn.addEventListener('click', () => {
+    if (!selectedCoffee) return;
+    setTimeout(() => {
+      sugarSection.style.display = 'flex';
+      confirmBtn.style.display = 'block';
+      coffeeCard.classList.add('selecting-sugar'); // hide illustration
+    }, 1000);
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    coffeeCard.classList.remove('selecting-sugar'); // show illustration again
+  });
+}
+
 </script>
 
 <!-- Footer -->
@@ -333,3 +350,4 @@ window.addEventListener('beforeunload', (e) => {
 
 </body>
 </html>
+
