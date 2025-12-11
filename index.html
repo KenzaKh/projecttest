@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coffee House</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="stylesheet" href="main.css" />
+</head>
+<body>
+
+  <!-- NAVBAR / Logo Bar -->
+  <div class="navbar">
+    <img src="logo.png" class="logo" alt="Coffee Logo">
+  </div>
+
+  <div class="main-container">
+
+    <!-- Coffee card -->
+    <div class="coffee-card">
+
+      <div class="left-section">
+        <p class="instruction">
+          Choose your coffee type, then click <strong>Select</strong>.
+        </p>
+
+        <div class="btn-group">
+          <button class="coffee-btn" data-key="americano" data-price="2.5">Americano - 2.50 DT</button>
+          <button class="coffee-btn" data-key="cappuccino" data-price="3.5">Cappuccino - 3.50 DT</button>
+          <button class="coffee-btn" data-key="espresso" data-price="3.0">Espresso - 3.00 DT</button>
+        </div>
+
+        <button class="select-btn">Select</button>
+
+        <div class="sugar-section" style="display:none;">
+          <p>How many sugar cubes?</p>
+          <div class="sugar-controls">
+            <button class="sugar-btn" id="minus">-</button>
+            <span id="sugar-count">0</span>
+            <button class="sugar-btn" id="plus">+</button>
+          </div>
+        </div>
+
+        <button class="confirm-btn" style="display:none;">Confirm</button>
+      </div>
+
+      <div class="right-section">
+        <img src="illustration.png" class="illustration" alt="Coffee illustration" />
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-column">
+
+      <!-- History -->
+      <div class="history-card">
+        <h2>Order History</h2>
+        <div class="receipt-history">
+          <div class="no-orders">
+            <img src="noorders.png" alt="No Orders" />
+            <p>No orders yet</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Card with Illustration -->
+      <div class="total-card">
+        <h2>Total</h2>
+        <p class="total-amount">0.00 DT</p>
+        <img src="receipt.png" alt="Receipt Illustration">
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup -->
+  <div class="popup" id="popup">
+    <div class="popup-content" id="popup-content">
+      <img id="popup-img" src="" alt="" />
+      <h2 id="popup-title">Title</h2>
+      <p id="popup-message">Message</p>
+
+      <!-- generic close (used for informational popups) -->
+      <div class="popup-actions">
+        <button id="popup-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ===== JAVASCRIPT LOGIC ===== */
+
+const buttons = document.querySelectorAll('.coffee-btn');
+const selectBtn = document.querySelector('.select-btn');
+const sugarSection = document.querySelector('.sugar-section');
+const sugarCountEl = document.getElementById('sugar-count');
+const minusBtn = document.getElementById('minus');
+const plusBtn = document.getElementById('plus');
+const confirmBtn = document.querySelector('.confirm-btn');
+
+const popup = document.getElementById('popup');
+const popupTitle = document.getElementById('popup-title');
+const popupMessage = document.getElementById('popup-message');
+const popupImg = document.getElementById('popup-img');
+const popupClose = document.getElementById('popup-close');
+const popupContent = document.getElementById('popup-content');
+
+let selectedCoffee = null;
+let sugarCount = 0;
+let loadingTimeout = null;
+
+/* ===== Reset coffee selection ===== */
+function resetSelection() {
+  if (loadingTimeout) clearTimeout(loadingTimeout);
+  loadingTimeout = null;
+  selectBtn.textContent = 'Select';
+  selectBtn.disabled = false;
+  sugarSection.style.display = 'none';
+  confirmBtn.style.display = 'none';
+  sugarCount = 0;
+  sugarCountEl.textContent = sugarCount;
+}
+
+/* ===== Coffee button selection ===== */
+buttons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    resetSelection();
+    buttons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedCoffee = btn.dataset.key;
+  });
+});
+
+/* ===== Select button behavior ===== */
+selectBtn.addEventListener('click', () => {
+  if (!selectedCoffee) {
+    showPopup('Error', 'Please select a coffee first!', 'error.png');
+    return;
+  }
+  selectBtn.textContent = 'Loading...';
+  selectBtn.disabled = true;
+
+  loadingTimeout = setTimeout(() => {
+    sugarSection.style.display = 'flex';
+    confirmBtn.style.display = 'block';
+  }, 1000);
+});
+
+/* ===== Sugar controls ===== */
+minusBtn.addEventListener('click', () => {
+  if (sugarCount > 0) sugarCount--;
+  sugarCountEl.textContent = sugarCount;
+});
+
+plusBtn.addEventListener('click', () => {
+  if (sugarCount < 5) sugarCount++;
+  sugarCountEl.textContent = sugarCount;
+});
+
+/* ===== Confirm button ===== */
+confirmBtn.addEventListener('click', () => {
+  const isSuccess = Math.random() < 0.9;
+
+  if (isSuccess) {
+    showPopup('Success', `Thank you! Please wait until your cup is ready.`, 'done.png');
+    createReceipt(selectedCoffee, sugarCount, buttons);
+  } else {
+    showPopup('Error', 'Something went wrong. Please try again.', 'error.png');
+  }
+
+  resetSelection();
+  buttons.forEach(b => b.classList.remove('active'));
+  selectedCoffee = null;
+});
+
+/* ===== Popup ===== */
+function showPopup(title, message, imgSrc) {
+  // remove any previous confirmation button row if present
+  const oldRow = popupContent.querySelector('.btn-row');
+  if (oldRow) oldRow.remove();
+
+  popupTitle.textContent = title;
+  popupMessage.textContent = message;
+  popupImg.src = imgSrc || '';
+  popupImg.style.display = imgSrc ? 'block' : 'none';
+  popupTitle.style.color = title === 'Error' ? '#d9534f' : (title === 'Confirm Delete' ? '#8b5e3c' : '#5cb85c');
+  popup.style.display = 'flex';
+
+  // Show close button only for informational popups (not for confirm flows)
+  const infoClose = document.getElementById('popup-close');
+  if (title === 'Confirm Delete') {
+    infoClose.style.display = 'none';
+  } else {
+    infoClose.style.display = 'inline-block';
+  }
+}
+
+popupClose.addEventListener('click', () => {
+  // cleanup confirm button row if exists
+  const oldRow = popupContent.querySelector('.btn-row');
+  if (oldRow) oldRow.remove();
+  popup.style.display = 'none';
+});
+
+/* ===== Create receipt ===== */
+function createReceipt(coffeeKey, sugarCount, buttons) {
+  const historyContainer = document.querySelector('.receipt-history');
+
+  const coffeeBtn = Array.from(buttons).find(b => b.dataset.key === coffeeKey);
+  const coffeeName = coffeeBtn ? coffeeBtn.textContent.split(' - ')[0] : coffeeKey;
+  const coffeePrice = coffeeBtn ? coffeeBtn.dataset.price : '0.00';
+
+  const receipt = document.createElement('div');
+  receipt.classList.add('receipt-card');
+  receipt.innerHTML = `
+    <h3>Order</h3>
+    <p><strong>Coffee:</strong> ${coffeeName}</p>
+    <p><strong>Sugar:</strong> ${sugarCount} cube(s)</p>
+    <p><strong>Price:</strong> ${coffeePrice} DT</p>
+    <button class="delete-receipt">Delete</button>
+  `;
+
+  // Delete button with confirmation (wide side-by-side buttons)
+  receipt.querySelector('.delete-receipt').addEventListener('click', () => {
+    // remove old button rows from popup (if any)
+    const oldBtns = popupContent.querySelectorAll('.btn-row');
+    oldBtns.forEach(b => b.remove());
+
+    showPopup('Confirm Delete', 'Are you sure you want to delete this order?', 'warning.png');
+
+    // create the row container (flex)
+    const btnRow = document.createElement('div');
+    btnRow.classList.add('btn-row');
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = 'Yes';
+    confirmBtn.classList.add('confirmation-btn');
+    confirmBtn.classList.add('confirm-wide'); // Option D: wider look
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'No';
+    cancelBtn.classList.add('confirmation-btn');
+    cancelBtn.classList.add('cancel-wide');
+
+    // click actions
+    confirmBtn.onclick = () => {
+      receipt.remove();
+      updateTotal();
+      updateNoOrdersPlaceholder();
+      updateOrderNumbers();
+      popup.style.display = 'none';
+      btnRow.remove();
+    };
+
+    cancelBtn.onclick = () => {
+      popup.style.display = 'none';
+      btnRow.remove();
+    };
+
+    // append buttons into row, row into popup
+    btnRow.appendChild(confirmBtn);
+    btnRow.appendChild(cancelBtn);
+    popupContent.appendChild(btnRow);
+  });
+
+  // Add new receipt at the top
+  historyContainer.prepend(receipt);
+
+  // Update numbers after adding
+  updateOrderNumbers();
+
+  updateTotal();
+  updateNoOrdersPlaceholder();
+}
+
+/* ===== Update order numbers sequentially ===== */
+function updateOrderNumbers() {
+  const receipts = document.querySelectorAll('.receipt-history .receipt-card');
+  const total = receipts.length;
+  receipts.forEach((receipt, index) => {
+    // numbering latest as highest -> Order #N ... #1
+    receipt.querySelector('h3').textContent = `Order #${total - index}`;
+  });
+}
+
+/* ===== Update total ===== */
+function updateTotal() {
+  let total = 0;
+  const receipts = document.querySelectorAll('.receipt-card');
+
+  receipts.forEach(receipt => {
+    const priceText = receipt.querySelector('p:nth-of-type(3)').textContent; // "Price: X DT"
+    const price = parseFloat(priceText.replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
+    total += price;
+  });
+
+  document.querySelector('.total-amount').textContent = `${total.toFixed(2)} DT`;
+}
+
+/* ===== Show/hide no-orders placeholder ===== */
+function updateNoOrdersPlaceholder() {
+  const historyContainer = document.querySelector('.receipt-history');
+  const noOrdersEl = historyContainer.querySelector('.no-orders');
+  const hasReceipts = historyContainer.querySelectorAll('.receipt-card').length > 0;
+
+  if (hasReceipts) {
+    if (noOrdersEl) noOrdersEl.style.display = 'none';
+  } else {
+    if (noOrdersEl) noOrdersEl.style.display = 'flex';
+  }
+}
+
+/* ===== Initialize placeholder on load ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  updateNoOrdersPlaceholder();
+});
+
+/* ===== Warn on page refresh/exit ===== */
+window.addEventListener('beforeunload', (e) => {
+  const receipts = document.querySelectorAll('.receipt-card');
+  if (receipts.length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+  }
+});
+</script>
+
+<!-- Footer -->
+<div class="footer">
+  &copy; Molk Kenza Takwa
+</div>
+
+</body>
+</html>
